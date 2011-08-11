@@ -1,4 +1,21 @@
 {
-	"color_scheme": "Packages/TextMate-Themes/idleFingers.tmTheme",
-	"font_size": 10
+    "rulers": [80],
+    "color_scheme": "Packages/TextMate-Themes/idleFingers.tmTheme",
+    "font_size": 10,
+    "tab_size": 4,
+    "use_tab_stops": true,
+    "detect_indentation": true,
+    "auto_indent": true,
+    "trim_automatic_white_space": true,
+    "word_wrap": false,
+    "draw_centered": false,
+    "draw_minimap_border": false,
+    "highlight_line": true,
+    "caret_style": "smooth",
+    "match_brackets": true,
+    "match_brackets_content": true,
+    "match_brackets_square": true,
+    "match_brackets_braces": true,
+    "match_brackets_angle": false,
+    "draw_white_space": "all"
 }

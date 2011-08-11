@@ -3,78 +3,81 @@
 // Settings may also be placed in file type specific options files, for example,
 // in Packages/Python/Python.sublime-settings for python files.
 {
-    // Sets the colors used within the text area
-    "color_scheme": "Packages/Color Scheme - Default/Monokai.tmTheme",
+	// Sets the colors used within the text area
+	"color_scheme": "Packages/Color Scheme - Default/Monokai.tmTheme",
 
-    // Note that the font_face and font_size are overriden in the platform
-    // specific settings file, for example, "Base File (Linux).sublime-settings".
-    // Because of this, setting them here will have no effect: you must set them
-    // in your User File Preferences.
-    "font_face": "Packages/Color Scheme - Default/Monokai.tmTheme",
-    "font_size": 11,
+	// Note that the font_face and font_size are overriden in the platform
+	// specific settings file, for example, "Base File (Linux).sublime-settings".
+	// Because of this, setting them here will have no effect: you must set them
+	// in your User File Preferences.
+	"font_face": "Packages/Color Scheme - Default/Monokai.tmTheme",
+	"font_size": 11,
 
-    // Valid options are "bold", "italic", "no_antialias", "gray_antialias",
-    // and "subpixel_antialias"
-    "font_options": [],
+	// Valid options are "bold", "italic", "no_antialias", "gray_antialias",
+	// and "subpixel_antialias".
+	"font_options": [],
 
-    // Characters that are considered to separate words
-    "word_separators": "./\\()\"'-:,.;<>~!@#$%^&*|+=[]{}`~?",
+	// Characters that are considered to separate words
+	"word_separators": "./\\()\"'-:,.;<>~!@#$%^&*|+=[]{}`~?",
 
-    // Set to false to prevent line numbers being drawn in the gutter
-    "line_numbers": true,
+	// Set to false to prevent line numbers being drawn in the gutter
+	"line_numbers": true,
 
-    // Set to false to hide the gutter altogether
-    "gutter": true,
+	// Set to false to hide the gutter altogether
+	"gutter": true,
 
-    // Columns in which to display vertical rulers
-    "rulers": [80],
+	// Columns in which to display vertical rulers
+	"rulers": [80],
 
-    // Set to true to turn spell checking on by default
-    "spell_check": false,
+	// Set to true to turn spell checking on by default
+	"spell_check": false,
 
-    // The number of spaces a tab is considered equal to
-    "tab_size": 4,
+	// The number of spaces a tab is considered equal to
+	"tab_size": 4,
 
-    // Set to true to insert spaces when tab is pressed
-    "translate_tabs_to_spaces": false,
+	// Set to true to insert spaces when tab is pressed
+	"translate_tabs_to_spaces": false,
 
-    // If translate_tabs_to_spaces is true, use_tab_stops will make tab and
-    // backspace insert/delete up to the next tabstop
-    "use_tab_stops": true,
+	// If translate_tabs_to_spaces is true, use_tab_stops will make tab and
+	// backspace insert/delete up to the next tabstop
+	"use_tab_stops": true,
 
-    // Set to false to disable automatic indentation
-    "auto_indent": true,
+	// Set to false to disable detection of tabs vs. spaces on load
+	"detect_indentation": true,
 
-    // Set to false to not trim white space added by auto_indent
-    "trim_automatic_white_space": true,
+	// Set to false to disable automatic indentation
+	"auto_indent": true,
 
-    // Set to false for horizontal scrolling
-    "word_wrap": false,
+	// Set to false to not trim white space added by auto_indent
+	"trim_automatic_white_space": true,
 
-    // Set to a value other than 0 to force wrapping at that column rather than the
-    // window width
-    "wrap_width": 0,
+	// Set to false for horizontal scrolling
+	"word_wrap": false,
 
-    // Set to false to prevent word wrapped lines from being indented to the same
-    // level
-    "indent_subsequent_lines": true,
+	// Set to a value other than 0 to force wrapping at that column rather than the
+	// window width
+	"wrap_width": 0,
 
-    // Set to true to draw text centered in the window rather than left aligned
-    "draw_centered": false,
+	// Set to false to prevent word wrapped lines from being indented to the same
+	// level
+	"indent_subsequent_lines": true,
 
-    // Set to false to stop auto pairing quotes, brackets etc
-    "auto_match_enabled": true,
+	// Set to true to draw text centered in the window rather than left aligned
+	"draw_centered": false,
 
-    // Word list to use for spell checking
-    "dictionary": "Packages/Language - English/en_US.dic",
+	// Set to false to stop auto pairing quotes, brackets etc
+	"auto_match_enabled": true,
 
-    // Set to true to draw a border around the visible rectangle on the minimap.
-    // The color of the border will be determined by the "minimapBorder" key in
-    // the color scheme
-    "draw_minimap_border": false,
+	// Word list to use for spell checking
+	"dictionary": "Packages/Language - English/en_US.dic",
+
+	// Set to true to draw a border around the visible rectangle on the minimap.
+	// The color of the border will be determined by the "minimapBorder" key in
+	// the color scheme
+	"draw_minimap_border": false,
 
 	// Set to false to disable highlighting any line with a caret
-    "highlight_line": true,
+	"highlight_line": true,
 
 	// Valid values are "smooth", "phase", "blink", "wide" and "solid".
 	"caret_style": "smooth",
@@ -97,9 +100,6 @@
 	// Set to false to not highlight angle brackets. This only takes effect if
 	// matchBrackets is true
 	"match_brackets_angle": false,
-
-	// Set to false to disable detection of tabs vs. spaces on load
-	"detect_indentation": true,
 
 	// Additional spacing at the top of each line, in pixels
 	"line_padding_top": 0,
