@@ -241,7 +241,11 @@
     },
     {
         "class": "disclosure_button_control",
-        "attributes": ["hover"],
+        "parents":
+        [
+            { "class": "tree_row", "attributes": ["hover"] }
+        ],
+        // "attributes": ["hover"],
         "layer0.opacity": 0.0,
         "layer1.opacity": 1.0
     },
@@ -300,6 +304,7 @@
         "row_padding": [8, 3],
         "indent": 12,
         "indent_offset": 17,
+        "indent_top_level": false,
         "layer0.tint": [214, 221, 230],
         "layer0.opacity": 1.0,
         "dark_content": false

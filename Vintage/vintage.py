@@ -133,6 +133,11 @@ class InputStateTracker(sublime_plugin.EventListener):
 
     def on_selection_modified(self, view):
         reset_input_state(view, False)
+        # Get out of visual line mode if the selection has changed, e.g., due
+        # to clicking with the mouse
+        if (g_input_state.motion_mode == MOTION_MODE_LINE and
+            not view.has_non_empty_selection_region()):
+            g_input_state.motion_mode = MOTION_MODE_NORMAL
         update_status_line(view)
 
     def on_load(self, view):
