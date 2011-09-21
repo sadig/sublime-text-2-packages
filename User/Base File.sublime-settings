@@ -3,6 +3,7 @@
 	"caret_style": "smooth",
 	"color_scheme": "Packages/TextMate-Themes/idleFingers.tmTheme",
 	"detect_indentation": true,
+	"default_line_ending": "unix",
 	"draw_centered": false,
 	"draw_minimap_border": false,
 	"draw_white_space": "all",
