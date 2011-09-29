@@ -2,8 +2,8 @@
 	"auto_indent": true,
 	"caret_style": "smooth",
 	"color_scheme": "Packages/TextMate-Themes/idleFingers.tmTheme",
-	"detect_indentation": true,
 	"default_line_ending": "unix",
+	"detect_indentation": true,
 	"draw_centered": false,
 	"draw_minimap_border": false,
 	"draw_white_space": "all",
@@ -16,7 +16,8 @@
 	"match_brackets_square": true,
 	"rulers":
 	[
-		80, 120
+		80,
+		120
 	],
 	"tab_size": 4,
 	"trim_automatic_white_space": true,
