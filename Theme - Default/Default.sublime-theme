@@ -455,6 +455,9 @@
         "layer1.texture": "Theme - Default/tab_selected.png",
         "layer1.inner_margin": [18, 4],
         "layer1.opacity": { "target": 0.0, "speed": 6.0, "interpolation": "smoothstep" },
+        "layer2.texture": "Theme - Default/tab_inner_glow.png",
+        "layer2.inner_margin": [18, 4],
+        "layer2.opacity": 0.0,
         "content_margin": [20, 4, 20, 4],
         "max_margin_trim": 4,
         "hit_test_level": 0.5
@@ -463,6 +466,12 @@
         "class": "tab_control",
         "attributes": ["selected"],
         "layer1.opacity": 1.0
+    },
+    {
+        "class": "tab_control",
+        "attributes": ["dirty"],
+        "settings": ["highlight_modified_tabs"],
+        "layer2.opacity": 1.0
     },
 
     {

@@ -388,7 +388,7 @@
 
 	{ "keys": ["G"], "command": "set_motion", "args": {
 		"motion": "vi_goto_line",
-		"motion_args": {"repeat": 1, "extend": true }},
+		"motion_args": {"repeat": 1, "explicit_repeat": true, "extend": true }},
 		"context": [{"key": "setting.command_mode"}]
 	},
 
@@ -444,13 +444,13 @@
 	{ "keys": ["ctrl+f"], "command": "set_motion", "args": {
 		"motion": "move",
 		"motion_args": {"by": "pages", "forward": true, "extend": true }},
-		"context": [{"key": "setting.command_mode"}]
+		"context": [{"key": "setting.command_mode"}, {"key": "setting.vintage_ctrl_keys"}]
 	},
 
 	{ "keys": ["ctrl+b"], "command": "set_motion", "args": {
 		"motion": "move",
 		"motion_args": {"by": "pages", "forward": false, "extend": true }},
-		"context": [{"key": "setting.command_mode"}]
+		"context": [{"key": "setting.command_mode"}, {"key": "setting.vintage_ctrl_keys"}]
 	},
 
 	{ "keys": ["H"], "command": "set_motion", "args": {

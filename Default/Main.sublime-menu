@@ -111,7 +111,7 @@
             { "command": "revert", "caption": "Revert File", "mnemonic": "v" },
             { "command": "close_all", "caption": "Close All Files" },
             { "caption": "-", "id": "exit" },
-            { "command": "hot_exit", "caption": "Hot Exit", "mnemonic": "x" }
+            { "command": "exit", "mnemonic": "x" }
         ]
     },
     {
@@ -366,14 +366,12 @@
                 ]
             },
             { "caption": "-", "id": "goto" },
-            { "command": "show_overlay", "args": {"overlay": "goto"}, "caption": "Goto Anything", "mnemonic": "A" },
+            { "command": "show_overlay", "args": {"overlay": "goto", "show_files": true}, "caption": "Goto Anything", "mnemonic": "A" },
             {
                 "caption": "Goto",
                 "mnemonic": "G",
                 "children":
                 [
-                    { "command": "show_overlay", "args": {"overlay": "goto", "show_files": true}, "caption": "Goto File", "mnemonic": "F" },
-                    { "caption": "-" },
                     { "command": "show_overlay", "args": {"overlay": "goto", "text": "@"}, "caption": "Goto Symbol" },
                     { "command": "show_overlay", "args": {"overlay": "goto", "text": "#"}, "caption": "Goto Word" },
                     { "command": "show_overlay", "args": {"overlay": "goto", "text": ":"}, "caption": "Goto Line" }
