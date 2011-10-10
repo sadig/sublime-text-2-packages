@@ -7,5 +7,7 @@
     { "keys": ["ctrl+e"], "command": "toggle_comment", "args": { "block": false } },
     { "keys": ["ctrl+shift+e"], "command": "toggle_comment", "args": { "block": true } },
     { "keys": ["ctrl+tab"], "command": "next_view" },
+   	{ "keys": ["f8"], "command": "show_panel", "args": {"panel": "console"} },
+
     { "keys": ["ctrl+shift+tab"], "command": "prev_view" }
 ]
