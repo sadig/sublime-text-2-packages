@@ -193,9 +193,9 @@
 			<key>settings</key>
 			<dict>
 				<key>background</key>
-				<string>#575757</string>
+				<string>#393939</string>
 				<key>foreground</key>
-				<string>#FFFFFF</string>
+				<string>#CCCCCC</string>
 			</dict>
 		</dict>
 		<dict>
