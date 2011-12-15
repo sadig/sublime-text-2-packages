@@ -156,6 +156,10 @@
 	// ASCII, UTF-8 and UTF-16 encodings will be automatically detected.
 	"fallback_encoding": "Western (Windows 1252)",
 
+	// Encoding used when saving new files. Existing files ignore this, instead
+	// preserving the encoding they were opened with.
+	"default_encoding": "UTF-8",
+
 	// Determines what character(s) are used to terminate each line in new files.
 	// Valid values are 'system' (whatever the OS uses), 'windows' (CRLF) and
 	// 'unix' (LF only).
