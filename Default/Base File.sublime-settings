@@ -55,7 +55,7 @@
 	// Set to false to disable detection of tabs vs. spaces on load
 	"detect_indentation": true,
 
-	// Set to false to disable automatic indentation
+	// Calculates indentation automatically when pressing enter
 	"auto_indent": true,
 
 	// Set to false to not trim white space added by auto_indent
