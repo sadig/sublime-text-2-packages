@@ -732,19 +732,16 @@
         [
             { "command": "open_dir", "args": {"dir": "$packages"}, "caption": "Browse Packages…", "mnemonic": "B" },
             { "caption": "-" },
-            { "command": "open_file", "args": {"file": "${packages}/Default/Base File.sublime-settings"}, "caption": "File Settings – Default" },
-            { "command": "open_file", "args": {"file": "${packages}/User/Base File.sublime-settings"}, "caption": "File Settings – User" },
+            { "command": "open_file", "args": {"file": "${packages}/Default/Preferences.sublime-settings"}, "caption": "Settings – Default" },
+            { "command": "open_file", "args": {"file": "${packages}/User/Preferences.sublime-settings"}, "caption": "Settings – User" },
             {
-                "caption": "File Settings – More",
+                "caption": "Settings – More",
                 "children":
                 [
                     { "command": "open_file_settings", "caption": "Syntax Specific – User" },
                     { "command": "open_file", "args": {"file": "${packages}/User/Distraction Free.sublime-settings"}, "caption": "Distraction Free – User" }
                 ]
             },
-            { "caption": "-" },
-            { "command": "open_file", "args": {"file": "${packages}/Default/Global.sublime-settings"}, "caption": "Global Settings – Default" },
-            { "command": "open_file", "args": {"file": "${packages}/User/Global.sublime-settings"}, "caption": "Global Settings – User" },
             { "caption": "-" },
             {
                 "command": "open_file", "args":

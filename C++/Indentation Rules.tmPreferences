@@ -30,7 +30,7 @@
 	                                    #  terminated with ;, :, {, or }
 	</string>
 		<key>unIndentedLinePattern</key>
-		<string>^\s*((/\*|\*/|//|#|template\b.*?&gt;(?!\(.*\))|@protocol|@interface(?!.*\{)|@implementation|@end).*)?$</string>
+		<string>^\s*((/\*|.*\*/|//|#|template\b.*?&gt;(?!\(.*\))|@protocol|@interface(?!.*\{)|@implementation|@end).*)?$</string>
 		<key>disableIndentNextLinePattern</key>
 		<string>^\s*\{\}?\s*$</string>
 	</dict>
