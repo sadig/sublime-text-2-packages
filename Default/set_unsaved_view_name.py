@@ -1,17 +1,28 @@
 import sublime, sublime_plugin
 import os.path
 import string
+import functools
 
 class SetUnsavedViewName(sublime_plugin.EventListener):
     setting_name = False
 
     dropped_chars = string.whitespace + string.punctuation
 
+    pending = 0
+
     def on_modified(self, view):
         if view.file_name() or view.is_loading():
             return
 
         if self.setting_name:
+            return
+
+        self.pending += 1
+        sublime.set_timeout(functools.partial(self.update_title, view), 20)
+
+    def update_title(self, view):
+        self.pending -= 1
+        if self.pending != 0:
             return
 
         cur_name = view.settings().get('auto_name')
