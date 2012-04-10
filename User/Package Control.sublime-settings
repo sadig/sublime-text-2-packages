@@ -1,8 +1,7 @@
 {
-	"auto_upgrade_last_run": 1332333087,
+	"auto_upgrade_last_run": 1334034744,
 	"installed_packages":
 	[
-		"Package Control",
-		"SVN"
+		"Package Control"
 	]
 }
