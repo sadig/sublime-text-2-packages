@@ -5,9 +5,6 @@ import os.path
 MOTION_MODE_NORMAL = 0
 # Used in visual line mode: Motions are extended to BOL and EOL.
 MOTION_MODE_LINE = 2
-# Used by some actions, just as 'd'. If a motion crosses line boundaries,
-# it'll be extended to BOL and EOL
-MOTION_MODE_AUTO_LINE = 1
 
 # Registers are used for clipboards and macro storage
 g_registers = {}
@@ -17,7 +14,6 @@ g_registers = {}
 # * set_action
 # * set_motion
 # * push_repeat_digit
-
 class InputState:
     prefix_repeat_digits = []
     action_command = None
@@ -27,6 +23,7 @@ class InputState:
     motion_command = None
     motion_command_args = None
     motion_mode = MOTION_MODE_NORMAL
+    motion_mode_overridden = False
     motion_inclusive = False
     motion_clip_to_line = False
     register = None
@@ -35,39 +32,35 @@ g_input_state = InputState()
 
 # Updates the status bar to reflect the current mode and input state
 def update_status_line(view):
-    cmd_mode = view.settings().get('command_mode')
+    desc = []
 
-    if cmd_mode and g_input_state.motion_mode == MOTION_MODE_LINE:
-        view.set_status('mode', 'VISUAL LINE MODE')
-    elif cmd_mode and view.has_non_empty_selection_region():
-        view.set_status('mode', 'VISUAL MODE')
-    elif cmd_mode:
-        desc = None
-        if g_input_state.register:
-            desc = 'Register "' + g_input_state.register + '" - '
-
-        repeat = (digits_to_number(g_input_state.prefix_repeat_digits)
-            * digits_to_number(g_input_state.motion_repeat_digits))
-        if g_input_state.action_command is not None or repeat != 1:
-            cmd_desc = g_input_state.action_command
-            if g_input_state.action_description:
-                cmd_desc = g_input_state.action_description
-
-            if cmd_desc and desc:
-                desc += " "
-                desc += cmd_desc
-
-            if repeat != 1 and desc:
-                desc = desc + " * " + str(repeat)
-            elif repeat != 1:
-                desc = "* " + str(repeat)
-
-        if desc:
-            view.set_status('mode', 'COMMAND MODE - ' + desc)
+    if view.settings().get('command_mode'):
+        if g_input_state.motion_mode == MOTION_MODE_LINE:
+            desc = ['VISUAL LINE MODE']
+        elif view.has_non_empty_selection_region():
+            desc = ['VISUAL MODE']
         else:
-            view.set_status('mode', 'COMMAND MODE')
+            desc = ['COMMAND MODE']
+            if g_input_state.action_command is not None:
+                if g_input_state.action_description:
+                    desc.append(g_input_state.action_description)
+                else:
+                    desc.append(g_input_state.action_command)
+
+            repeat = (digits_to_number(g_input_state.prefix_repeat_digits)
+                * digits_to_number(g_input_state.motion_repeat_digits))
+            if repeat != 1:
+                if g_input_state.action_command is not None:
+                    desc[-1] += " * " + str(repeat)
+                else:
+                    desc.append("* " + str(repeat))
+
+        if g_input_state.register is not None:
+            desc.insert(1, 'Register "' + g_input_state.register + '"')
     else:
-        view.set_status('mode', 'INSERT MODE')
+        desc = ['INSERT MODE']
+
+    view.set_status('mode', ' - '.join(desc))
 
 def set_motion_mode(view, mode):
     g_input_state.motion_mode = mode
@@ -81,6 +74,7 @@ def reset_input_state(view, reset_motion_mode = True):
     g_input_state.action_description = None
     g_input_state.motion_repeat_digits = []
     g_input_state.motion_command = None
+    g_input_state.motion_mode_overridden = False
     g_input_state.motion_command_args = None
     g_input_state.motion_inclusive = False
     g_input_state.motion_clip_to_line = False
@@ -88,13 +82,15 @@ def reset_input_state(view, reset_motion_mode = True):
     if reset_motion_mode:
         set_motion_mode(view, MOTION_MODE_NORMAL)
 
+class ViCancelCurrentAction(sublime_plugin.TextCommand):
+    def run(self, action, action_args = {}, motion_mode = None, description = None):
+        reset_input_state(self.view, True)
+
 def string_to_motion_mode(mode):
     if mode == 'normal':
         return MOTION_MODE_NORMAL
     elif mode == 'line':
         return MOTION_MODE_LINE
-    elif mode == 'auto_line':
-        return MOTION_MODE_AUTO_LINE
     else:
         return -1
 
@@ -162,6 +158,10 @@ class InputStateTracker(sublime_plugin.EventListener):
             v = g_input_state.action_command is not None
             if operator == sublime.OP_EQUAL: return v == operand
             if operator == sublime.OP_NOT_EQUAL: return v != operand
+        elif key == "vi_has_register":
+            r = g_input_state.register is not None
+            if operator == sublime.OP_EQUAL: return r == operand
+            if operator == sublime.OP_NOT_EQUAL: return r != operand
         elif key == "vi_motion_mode":
             m = string_to_motion_mode(operand)
             if operator == sublime.OP_EQUAL:
@@ -169,10 +169,17 @@ class InputStateTracker(sublime_plugin.EventListener):
             if operator == sublime.OP_NOT_EQUAL:
                 return m != g_input_state.motion_mode
         elif key == "vi_has_repeat_digit":
-            if g_input_state.motion_command:
+            if g_input_state.action_command:
                 v = len(g_input_state.motion_repeat_digits) > 0
             else:
                 v = len(g_input_state.prefix_repeat_digits) > 0
+            if operator == sublime.OP_EQUAL: return v == operand
+            if operator == sublime.OP_NOT_EQUAL: return v != operand
+        elif key == "vi_has_input_state":
+            v = (len(g_input_state.motion_repeat_digits) > 0 or
+                len(g_input_state.prefix_repeat_digits) > 0 or
+                g_input_state.action_command is not None or
+                g_input_state.register is not None)
             if operator == sublime.OP_EQUAL: return v == operand
             if operator == sublime.OP_NOT_EQUAL: return v != operand
         elif key == "vi_can_enter_text_object":
@@ -240,22 +247,11 @@ class SetAction(sublime_plugin.TextCommand):
 
         return self.run(**args)
 
-    def run(self, action, action_args = {}, motion_mode = None, description = None):
+    def run(self, action, action_args = {}, description = None):
         global g_input_state
         g_input_state.action_command = action
         g_input_state.action_command_args = action_args
         g_input_state.action_description = description
-
-        if motion_mode is not None:
-            m = string_to_motion_mode(motion_mode)
-            if m != -1:
-                if g_input_state.motion_mode == MOTION_MODE_LINE and m == MOTION_MODE_AUTO_LINE:
-                    # e.g., 'Vjd', MOTION_MODE_LINE should be maintained
-                    pass
-                else:
-                    set_motion_mode(self.view, m)
-            else:
-                print "invalid motion mode:", motion_mode
 
         if self.view.has_non_empty_selection_region():
             # Currently in visual mode, so no following motion is expected:
@@ -283,7 +279,7 @@ class SetMotion(sublime_plugin.TextCommand):
     def run_(self, args):
         return self.run(**args)
 
-    def run(self, motion, motion_args = {}, inclusive = False,
+    def run(self, motion, motion_args = {}, linewise = False, inclusive = False,
             clip_to_line = False, character = None, mode = None):
 
         global g_input_state
@@ -297,6 +293,10 @@ class SetMotion(sublime_plugin.TextCommand):
         g_input_state.motion_command_args = motion_args
         g_input_state.motion_inclusive = inclusive
         g_input_state.motion_clip_to_line = clip_to_line
+        if not g_input_state.motion_mode_overridden \
+                and g_input_state.action_command \
+                and linewise:
+            g_input_state.motion_mode = MOTION_MODE_LINE
 
         if mode is not None:
             m = string_to_motion_mode(mode)
@@ -316,7 +316,7 @@ class SetActionMotion(sublime_plugin.TextCommand):
         return self.run(**args)
 
     def run(self, motion, action, motion_args = {}, motion_clip_to_line = False,
-            motion_inclusive = False, action_args = {}):
+            motion_inclusive = False, motion_linewise = False, action_args = {}):
 
         global g_input_state
 
@@ -326,6 +326,8 @@ class SetActionMotion(sublime_plugin.TextCommand):
         g_input_state.motion_clip_to_line = motion_clip_to_line
         g_input_state.action_command = action
         g_input_state.action_command_args = action_args
+        if motion_linewise:
+            g_input_state.motion_mode = MOTION_MODE_LINE
 
         eval_input(self.view)
 
@@ -343,6 +345,7 @@ class SetMotionMode(sublime_plugin.TextCommand):
 
         if m != -1:
             set_motion_mode(self.view, m)
+            g_input_state.motion_mode_overridden = True
         else:
             print "invalid motion mode"
 
@@ -403,7 +406,7 @@ def transform_selection_regions(view, f):
     for r in new_sel:
         sel.add(r)
 
-def expand_to_full_line(view):
+def expand_to_full_line(view, ignore_trailing_newline = True):
     new_sel = []
     for s in view.sel():
         if s.a == s.b:
@@ -414,7 +417,7 @@ def expand_to_full_line(view):
 
             a = la.a
 
-            if s.end() == lb.a:
+            if ignore_trailing_newline and s.end() == lb.a:
                 # s.end() is already at EOL, don't go down to the next line
                 b = s.end()
             else:
@@ -456,31 +459,6 @@ def set_single_character_selection_direction(view, forward):
     transform_selection_regions(view,
         lambda r: orient_single_character_region(view, forward, r))
 
-def expand_line_spanning_selections_to_line(view):
-    new_sel = []
-    for s in view.sel():
-        if s.a == s.b:
-            new_sel.append(s)
-            continue
-
-        la = view.full_line(s.a)
-        lb = view.full_line(s.b)
-
-        if la == lb:
-            new_sel.append(s)
-        elif s.a < s.b:
-            a = la.a
-            b = lb.b
-            new_sel.append(sublime.Region(a, b))
-        else:
-            a = la.b
-            b = lb.a
-            new_sel.append(sublime.Region(a, b))
-
-    view.sel().clear()
-    for s in new_sel:
-        view.sel().add(s)
-
 def clip_empty_selection_to_line_contents(view):
     new_sel = []
     for s in view.sel():
@@ -503,6 +481,14 @@ def shrink_inclusive(r):
 
 def shrink_exclusive(r):
     return sublime.Region(r.b, r.b, r.xpos())
+
+def shrink_to_first_char(r):
+    if r.b < r.a:
+        # If the Region is reversed, the first char is the character *before*
+        # the first bound.
+        return sublime.Region(r.a - 1)
+    else:
+        return sublime.Region(r.a)
 
 # This is the core: it takes a motion command, action command, and repeat
 # counts, and runs them all.
@@ -617,14 +603,25 @@ class ViEval(sublime_plugin.TextCommand):
             if motion_mode != MOTION_MODE_LINE and action_command and motion_clip_to_line:
                 transform_selection_regions(self.view, lambda r: self.view.split_by_newlines(r)[0])
 
+            reindent = False
+
             if motion_mode == MOTION_MODE_LINE:
-                expand_to_full_line(self.view)
-            elif motion_mode == MOTION_MODE_AUTO_LINE:
-                expand_line_spanning_selections_to_line(self.view)
+                expand_to_full_line(self.view, visual_mode)
+                if action_command == "enter_insert_mode":
+                    # When lines are deleted before entering insert mode, the
+                    # cursor should be left on an empty line. Leave the trailing
+                    # newline out of the selection to allow for this.
+                    transform_selection_regions(self.view,
+                        lambda r: (sublime.Region(r.begin(), r.end() - 1)
+                                   if not r.empty() and self.view.substr(r.end() - 1) == "\n"
+                                   else r))
+                    reindent = True
 
             if action_command:
                 # Apply the action to the selection
                 self.view.run_command(action_command, action_args)
+                if reindent and self.view.settings().get('auto_indent'):
+                    self.view.run_command('reindent', {'force_indent': False})
 
         if not visual_mode:
             # Shrink the selection down to a point
@@ -650,13 +647,15 @@ class EnterInsertMode(sublime_plugin.TextCommand):
         else:
             return self.run()
 
-    def run(self, insert_command = None, insert_args = None):
+    def run(self, insert_command = None, insert_args = {}, register = '"'):
         # mark_undo_groups_for_gluing allows all commands run while in insert
         # mode to comprise a single undo group, which is important for '.' to
         # work as desired.
         self.view.run_command('maybe_mark_undo_groups_for_gluing')
         if insert_command:
-            self.view.run_command(insert_command, insert_args)
+            args = insert_args.copy()
+            args.update({'register': register})
+            self.view.run_command(insert_command, args)
 
         self.view.settings().set('command_mode', False)
         self.view.settings().set('inverse_caret_state', False)
@@ -722,6 +721,35 @@ class ShrinkSelections(sublime_plugin.TextCommand):
     def run(self, edit):
         transform_selection_regions(self.view, self.shrink)
 
+class ShrinkSelectionsToBeginning(sublime_plugin.TextCommand):
+    def shrink(self, r):
+        return sublime.Region(r.begin())
+
+    def run(self, edit, register = '"'):
+        transform_selection_regions(self.view, self.shrink)
+
+class ShrinkSelectionsToEnd(sublime_plugin.TextCommand):
+    def shrink(self, r):
+        end = r.end()
+        if self.view.substr(end - 1) == u'\n':
+            # For linewise selections put the cursor *before* the line break
+            return sublime.Region(end - 1)
+        else:
+            return sublime.Region(end)
+
+    def run(self, edit, register = '"'):
+        transform_selection_regions(self.view, self.shrink)
+
+class VisualUpperCase(sublime_plugin.TextCommand):
+    def run(self, edit):
+        self.view.run_command("upper_case")
+        self.view.run_command("exit_visual_mode")
+
+class VisualLowerCase(sublime_plugin.TextCommand):
+    def run(self, edit):
+        self.view.run_command("lower_case")
+        self.view.run_command("exit_visual_mode")
+
 # Sequence is used as part of glue_marked_undo_groups: the marked undo groups
 # are rewritten into a single sequence command, that accepts all the previous
 # commands
@@ -732,9 +760,10 @@ class Sequence(sublime_plugin.TextCommand):
 
 class ViDelete(sublime_plugin.TextCommand):
     def run(self, edit, register = '"'):
-        set_register(self.view, register, forward=False)
-        set_register(self.view, '1', forward=False)
-        self.view.run_command('left_delete')
+        if self.view.has_non_empty_selection_region():
+            set_register(self.view, register, forward=False)
+            set_register(self.view, '1', forward=False)
+            self.view.run_command('left_delete')
 
 class ViLeftDelete(sublime_plugin.TextCommand):
     def run(self, edit, register = '"'):
@@ -754,11 +783,11 @@ class ViCopy(sublime_plugin.TextCommand):
     def run(self, edit, register = '"'):
         set_register(self.view, register, forward=True)
         set_register(self.view, '0', forward=True)
-        transform_selection_regions(self.view, lambda r: sublime.Region(r.a))
+        transform_selection_regions(self.view, shrink_to_first_char)
 
-class ViPasteRight(sublime_plugin.TextCommand):
-    # Ensure the register is picked up from g_input_state, and that it'll be
-    # recorded on the undo stack
+class ViPrefixableCommand(sublime_plugin.TextCommand):
+    # Ensure register and repeat are picked up from g_input_state, and that
+    # it'll be recorded on the undo stack
     def run_(self, args):
         if not args:
             args = {}
@@ -766,6 +795,10 @@ class ViPasteRight(sublime_plugin.TextCommand):
         if g_input_state.register:
             args['register'] = g_input_state.register
             g_input_state.register = None
+
+        if g_input_state.prefix_repeat_digits:
+            args['repeat'] = digits_to_number(g_input_state.prefix_repeat_digits)
+            g_input_state.prefix_repeat_digits = []
 
         if 'event' in args:
             del args['event']
@@ -776,38 +809,26 @@ class ViPasteRight(sublime_plugin.TextCommand):
         finally:
             self.view.end_edit(edit)
 
+class ViPasteRight(ViPrefixableCommand):
     def advance(self, pt):
         if self.view.substr(pt) == '\n' or pt >= self.view.size():
             return pt
         else:
             return pt + 1
 
-    def run(self, edit, register = '"'):
-        transform_selection(self.view, lambda pt: self.advance(pt))
-        self.view.run_command('paste_from_register', {'forward': True, 'register': register})
+    def run(self, edit, register = '"', repeat = 1):
+        visual_mode = self.view.has_non_empty_selection_region()
+        if not visual_mode:
+            transform_selection(self.view, lambda pt: self.advance(pt))
+        self.view.run_command('paste_from_register', {'forward': not visual_mode,
+                                                      'repeat': repeat,
+                                                      'register': register})
 
-class ViPasteLeft(sublime_plugin.TextCommand):
-    # Ensure the register is picked up from g_input_state, and that it'll be
-    # recorded on the undo stack
-    def run_(self, args):
-        if not args:
-            args = {}
-
-        if g_input_state.register:
-            args['register'] = g_input_state.register
-            g_input_state.register = None
-
-        if 'event' in args:
-            del args['event']
-
-        edit = self.view.begin_edit(self.name(), args)
-        try:
-            return self.run(edit, **args)
-        finally:
-            self.view.end_edit(edit)
-
-    def run(self, edit, register = '"'):
-        self.view.run_command('paste_from_register', {'forward': False, 'register': register})
+class ViPasteLeft(ViPrefixableCommand):
+    def run(self, edit, register = '"', repeat = 1):
+        self.view.run_command('paste_from_register', {'forward': False,
+                                                      'repeat': repeat,
+                                                      'register': register})
 
 def set_register(view, register, forward):
     delta = 1
@@ -822,11 +843,17 @@ def set_register(view, register, forward):
         text.append(view.substr(s))
         regions.append(s)
 
-    text = "\n".join(text)
+    text = '\n'.join(text)
 
-    if register == '*' or register == '+':
+    use_sys_clipboard = view.settings().get('vintage_use_clipboard', False) == True
+
+    if (use_sys_clipboard and register == '"') or (register in ('*', '+')):
         sublime.set_clipboard(text)
-    elif register == '%':
+        # If the system's clipboard is used, Vim always propagates the data to
+        # the unnamed register too.
+        register = '"'
+
+    if register == '%':
         pass
     else:
         reg = register.lower()
@@ -838,31 +865,33 @@ def set_register(view, register, forward):
             g_registers[reg] = text
 
 def get_register(view, register):
+    use_sys_clipboard = view.settings().get('vintage_use_clipboard', False) == True
     register = register.lower()
     if register == '%':
         if view.file_name():
             return os.path.basename(view.file_name())
         else:
             return None
-    elif register == '*' or register == '+':
+    elif (use_sys_clipboard and register == '"') or (register in ('*', '+')):
         return sublime.get_clipboard()
-    elif register in g_registers:
-        return g_registers[register]
     else:
-        return None
+        return g_registers.get(register, None)
 
 def has_register(register):
-    if register in ["%", "*", "+"]:
+    if register in ['%', '*', '+']:
         return True
     else:
         return register in g_registers
 
 class PasteFromRegisterCommand(sublime_plugin.TextCommand):
-    def run(self, edit, register, forward = True):
+    def run(self, edit, register, repeat = 1, forward = True):
         text = get_register(self.view, register)
         if not text:
             sublime.status_message("Undefined register" + register)
             return
+        text = text * int(repeat)
+
+        self.view.run_command('vi_delete')
 
         regions = [r for r in self.view.sel()]
         new_sel = []
@@ -895,37 +924,96 @@ class PasteFromRegisterCommand(sublime_plugin.TextCommand):
         for s in new_sel:
             self.view.sel().add(s)
 
-    def is_enabled(self, register, forward = True):
+    def is_enabled(self, register, repeat = 1, forward = True):
         return has_register(register)
 
 class ReplaceCharacter(sublime_plugin.TextCommand):
     def run(self, edit, character):
         new_sel = []
+        created_new_line = False
         for s in reversed(self.view.sel()):
             if s.empty():
                 self.view.replace(edit, sublime.Region(s.b, s.b + 1), character)
-                new_sel.append(s)
+                if character == "\n":
+                    created_new_line = True
+                    # selection should be in the first column of the newly
+                    # created line
+                    new_sel.append(sublime.Region(s.b + 1))
+                else:
+                    new_sel.append(s)
             else:
-                self.view.replace(edit, s, character * len(s))
-                new_sel.append(s)
+                # Vim replaces characters with unprintable ones when r<enter> is
+                # pressed from visual mode.  Let's not make a replacement in
+                # that case.
+                if character != '\n':
+                    # Process lines contained in the selection individually.
+                    # This way we preserve newline characters.
+                    lines = self.view.split_by_newlines(s)
+                    for line in lines:
+                        self.view.replace(edit, line, character * line.size())
+                new_sel.append(sublime.Region(s.begin()))
 
         self.view.sel().clear()
         for s in new_sel:
             self.view.sel().add(s)
 
+        if created_new_line and self.view.settings().get('auto_indent'):
+            self.view.run_command('reindent', {'force_indent': False})
+
 class CenterOnCursor(sublime_plugin.TextCommand):
     def run(self, edit):
         self.view.show_at_center(self.view.sel()[0])
 
+class ScrollCursorLineToTop(sublime_plugin.TextCommand):
+    def run(self, edit):
+        self.view.set_viewport_position((self.view.viewport_position()[0], self.view.layout_extent()[1]))
+        self.view.show(self.view.sel()[0], False)
+
+class ScrollCursorLineToBottom(sublime_plugin.TextCommand):
+    def run(self, edit):
+        self.view.set_viewport_position((self.view.viewport_position()[0], 0.0))
+        self.view.show(self.view.sel()[0], False)
+
+class ViScrollLines(ViPrefixableCommand):
+    def run(self, edit, forward = True, repeat = None):
+        if repeat:
+            line_delta = repeat * (1 if forward else -1)
+        else:
+            viewport_height = self.view.viewport_extent()[1]
+            lines_per_page = viewport_height / self.view.line_height()
+            line_delta = int(round(lines_per_page / (2 if forward else -2)))
+        visual_mode = self.view.has_non_empty_selection_region()
+
+        y_deltas = []
+        def transform(pt):
+            row = self.view.rowcol(pt)[0]
+            new_pt = self.view.text_point(row + line_delta, 0)
+            y_deltas.append(self.view.text_to_layout(new_pt)[1]
+                            - self.view.text_to_layout(pt)[1])
+            return new_pt
+
+        transform_selection(self.view, transform, extend = visual_mode)
+
+        self.view.run_command('vi_move_to_first_non_white_space_character',
+                              {'extend': visual_mode})
+
+        # Vim scrolls the viewport as far as it moves the cursor.  With multiple
+        # selections the cursors could have moved different distances, due to
+        # word wrapping.  Move the viewport by the average of those distances.
+        avg_y_delta = sum(y_deltas) / len(y_deltas)
+        vp = self.view.viewport_position()
+        self.view.set_viewport_position((vp[0], vp[1] + avg_y_delta))
+
+
 class ViIndent(sublime_plugin.TextCommand):
     def run(self, edit):
         self.view.run_command('indent')
-        transform_selection_regions(self.view, lambda r: sublime.Region(r.a))
+        transform_selection_regions(self.view, shrink_to_first_char)
 
 class ViUnindent(sublime_plugin.TextCommand):
     def run(self, edit):
         self.view.run_command('unindent')
-        transform_selection_regions(self.view, lambda r: sublime.Region(r.a))
+        transform_selection_regions(self.view, shrink_to_first_char)
 
 class ViSetBookmark(sublime_plugin.TextCommand):
     def run(self, edit, character):
@@ -967,11 +1055,27 @@ class ViReplayMacro(sublime_plugin.TextCommand):
         if not character in g_registers:
             return
         m = g_registers[character]
+        global g_input_state
 
-        for d in m:
-            cmd = d['command']
-            args = d['args']
-            self.view.run_command(cmd, args)
+        prefix_repeat_digits, motion_repeat_digits = None, None
+        if len(g_input_state.prefix_repeat_digits) > 0:
+            prefix_repeat_digits = digits_to_number(g_input_state.prefix_repeat_digits)
+
+        if len(g_input_state.motion_repeat_digits) > 0:
+            motion_repeat_digits = digits_to_number(g_input_state.motion_repeat_digits)
+
+        repetitions = 1
+        if prefix_repeat_digits:
+            repetitions *= prefix_repeat_digits
+
+        if motion_repeat_digits:
+            repetitions *= motion_repeat_digits
+
+        for i in range(repetitions):
+            for d in m:
+                cmd = d['command']
+                args = d['args']
+                self.view.run_command(cmd, args)
 
 class ShowAsciiInfo(sublime_plugin.TextCommand):
     def run(self, edit):
@@ -987,3 +1091,29 @@ class ViReverseSelectionsDirection(sublime_plugin.TextCommand):
         self.view.sel().clear()
         for s in new_sels:
             self.view.sel().add(s)
+
+class MoveGroupFocus(sublime_plugin.WindowCommand):
+    def run(self, direction):
+        cells = self.window.get_layout()['cells']
+        active_group = self.window.active_group()
+        x1, y1, x2, y2 = cells[active_group]
+
+        idxs = range(len(cells))
+        del idxs[active_group]
+
+        # Matches are any group that shares a border with the active group in the
+        # specified direction.
+        if direction == "up":
+            matches = (i for i in idxs if cells[i][3] == y1 and cells[i][0] < x2 and cells[i][2] > x1)
+        elif direction == "down":
+            matches = (i for i in idxs if cells[i][1] == y2 and cells[i][0] < x2 and cells[i][2] > x1)
+        elif direction == "right":
+            matches = (i for i in idxs if cells[i][0] == x2 and cells[i][1] < y2 and cells[i][3] > y1)
+        elif direction == "left":
+            matches = (i for i in idxs if cells[i][2] == x1 and cells[i][1] < y2 and cells[i][3] > y1)
+
+        # Focus the first group found in the specified direction, if there is one.
+        try:
+            self.window.focus_group(matches.next())
+        except StopIteration:
+            return

@@ -6,9 +6,11 @@
         "children":
         [
             { "command": "new_file", "caption": "New File", "mnemonic": "N" },
-            { "command": "prompt_open_file", "caption": "Open File…", "mnemonic": "O" },
-            { "command": "prompt_open_folder", "caption": "Open Folder…" },
-            { "command": "clone_file", "mnemonic": "e" },
+
+            { "command": "prompt_open_file", "caption": "Open File…", "mnemonic": "O", "platform": "!OSX" },
+            { "command": "prompt_open_folder", "caption": "Open Folder…", "platform": "!OSX" },
+            { "command": "prompt_open", "caption": "Open…", "platform": "OSX" },
+
             {
                 "caption": "Open Recent",
                 "mnemonic": "R",
@@ -77,14 +79,18 @@
                     { "caption": "Hexadecimal", "command": "reopen", "args": {"encoding": "Hexadecimal" } }
                 ]
             },
+            { "command": "clone_file", "caption": "New View into File", "mnemonic": "e" },
             { "command": "save", "caption": "Save", "mnemonic": "S" },
             {
                 "caption": "Save with Encoding",
                 "children":
                 [
                     { "caption": "UTF-8", "command": "save", "args": {"encoding": "utf-8" } },
+                    { "caption": "UTF-8 with BOM", "command": "save", "args": {"encoding": "utf-8 with bom" } },
                     { "caption": "UTF-16 LE", "command": "save", "args": {"encoding": "utf-16 le" } },
+                    { "caption": "UTF-16 LE with BOM", "command": "save", "args": {"encoding": "utf-16 le with bom" } },
                     { "caption": "UTF-16 BE", "command": "save", "args": {"encoding": "utf-16 be" } },
+                    { "caption": "UTF-16 BE with BOM", "command": "save", "args": {"encoding": "utf-16 be with bom" } },
                     { "caption": "-" },
                     { "caption": "Western (Windows 1252)", "command": "save", "args": {"encoding": "Western (Windows 1252)" } },
                     { "caption": "Western (ISO 8859-1)", "command": "save", "args": {"encoding": "Western (ISO 8859-1)" } },
@@ -661,6 +667,7 @@
                 ]
             },
             { "command": "build", "mnemonic": "B" },
+            { "command": "build", "args": {"variant": "Run"}, "mnemonic": "R" },
             { "command": "exec", "args": {"kill": true}, "caption": "Cancel Build", "mnemonic": "C" },
             {
                 "caption": "Build Results",
@@ -732,10 +739,10 @@
         [
             { "command": "open_dir", "args": {"dir": "$packages"}, "caption": "Browse Packages…", "mnemonic": "B" },
             { "caption": "-" },
-            { "command": "open_file", "args": {"file": "${packages}/Default/Base File.sublime-settings"}, "caption": "File Settings – Default" },
-            { "command": "open_file", "args": {"file": "${packages}/User/Base File.sublime-settings"}, "caption": "File Settings – User" },
+            { "command": "open_file", "args": {"file": "${packages}/Default/Preferences.sublime-settings"}, "caption": "Settings – Default" },
+            { "command": "open_file", "args": {"file": "${packages}/User/Preferences.sublime-settings"}, "caption": "Settings – User" },
             {
-                "caption": "File Settings – More",
+                "caption": "Settings – More",
                 "children":
                 [
                     { "command": "open_file_settings", "caption": "Syntax Specific – User" },
@@ -743,54 +750,17 @@
                 ]
             },
             { "caption": "-" },
-            { "command": "open_file", "args": {"file": "${packages}/Default/Global.sublime-settings"}, "caption": "Global Settings – Default" },
-            { "command": "open_file", "args": {"file": "${packages}/User/Global.sublime-settings"}, "caption": "Global Settings – User" },
-            { "caption": "-" },
             {
                 "command": "open_file", "args":
                 {
-                    "file": "${packages}/Default/Default (Windows).sublime-keymap",
-                    "platform": "Windows"
+                    "file": "${packages}/Default/Default ($platform).sublime-keymap"
                 },
                 "caption": "Key Bindings – Default"
             },
             {
                 "command": "open_file", "args":
                 {
-                    "file": "${packages}/Default/Default (OSX).sublime-keymap",
-                    "platform": "OSX"
-                },
-                "caption": "Key Bindings – Default"
-            },
-            {
-                "command": "open_file", "args":
-                {
-                    "file": "${packages}/Default/Default (Linux).sublime-keymap",
-                    "platform": "Linux"
-                },
-                "caption": "Key Bindings – Default"
-            },
-            {
-                "command": "open_file", "args":
-                {
-                    "file": "${packages}/User/Default (Windows).sublime-keymap",
-                    "platform": "Windows"
-                },
-                "caption": "Key Bindings – User"
-            },
-            {
-                "command": "open_file", "args":
-                {
-                    "file": "${packages}/User/Default (OSX).sublime-keymap",
-                    "platform": "OSX"
-                },
-                "caption": "Key Bindings – User"
-            },
-            {
-                "command": "open_file", "args":
-                {
-                    "file": "${packages}/User/Default (Linux).sublime-keymap",
-                    "platform": "Linux"
+                    "file": "${packages}/User/Default ($platform).sublime-keymap"
                 },
                 "caption": "Key Bindings – User"
             },

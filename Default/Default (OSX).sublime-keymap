@@ -5,7 +5,7 @@ and don't need to be repeated here. Anything listed here will take precedence, h
 [
 	{ "keys": ["super+shift+n"], "command": "new_window" },
 	{ "keys": ["super+shift+w"], "command": "close_window" },
-	{ "keys": ["super+o"], "command": "prompt_open_file" },
+	{ "keys": ["super+o"], "command": "prompt_open" },
 	{ "keys": ["super+shift+t"], "command": "reopen_last_file" },
 	{ "keys": ["super+alt+up"], "command": "switch_file", "args": {"extensions": ["cpp", "cxx", "cc", "c", "hpp", "hxx", "h", "ipp", "inl", "m", "mm"]} },
 	{ "keys": ["super+n"], "command": "new_file" },
@@ -228,6 +228,7 @@ and don't need to be repeated here. Anything listed here will take precedence, h
 
 	{ "keys": ["f7"], "command": "build" },
 	{ "keys": ["super+b"], "command": "build" },
+	{ "keys": ["super+shift+b"], "command": "build", "args": {"variant": "Run"} },
 
 	{ "keys": ["ctrl+t"], "command": "transpose" },
 
@@ -600,7 +601,7 @@ and don't need to be repeated here. Anything listed here will take precedence, h
 		"context": [{"key": "panel", "operand": "incremental_find"}, {"key": "panel_has_focus"}]
 	},
 
-	{ "keys": ["super+,"], "command": "open_file", "args": {"file": "${packages}/User/Base File.sublime-settings"} },
+	{ "keys": ["super+,"], "command": "open_file", "args": {"file": "${packages}/User/Preferences.sublime-settings"} },
 
 	{ "keys": ["super+k", "super+y"], "command": "yank" },
 	{ "keys": ["super+k", "super+k"], "command": "run_macro_file", "args": {"file": "Packages/Default/Delete to Hard EOL.sublime-macro"} },
