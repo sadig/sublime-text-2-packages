@@ -1,5 +1,6 @@
 #coding=utf-8
 import sublime_plugin
+import re
 
 class SelectionOverlayCommand(sublime_plugin.TextCommand):
     "ctrl+ü => find that file with overlay"
@@ -10,7 +11,7 @@ class SelectionOverlayCommand(sublime_plugin.TextCommand):
             {
                 "overlay": "goto",
                 "show_files": True,
-                "text": selection.lower()
+                "text": re.sub(r'\W+', ' ', selection.lower())
             }
         )
 
