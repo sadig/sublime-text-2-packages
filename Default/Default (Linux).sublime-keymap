@@ -109,8 +109,7 @@
 			{ "key": "has_prev_field", "operator": "equal", "operand": true }
 		]
 	},
-	{ "keys": ["escape"], "command": "hide_panel", "args": {"cancel": true},
-		"context":
+	{ "keys": ["escape"], "command": "hide_panel", "context":
 		[
 			{ "key": "panel_visible", "operator": "equal", "operand": true }
 		]
@@ -257,8 +256,8 @@
 
 	{ "keys": ["ctrl+`"], "command": "show_panel", "args": {"panel": "console", "toggle": true} },
 
-	{ "keys": ["alt+/"], "command": "auto_complete" },
-	{ "keys": ["alt+/"], "command": "replace_completion_with_auto_complete", "context":
+	{ "keys": ["ctrl+space"], "command": "auto_complete" },
+	{ "keys": ["ctrl+space"], "command": "replace_completion_with_auto_complete", "context":
 		[
 			{ "key": "last_command", "operator": "equal", "operand": "insert_best_completion" },
 			{ "key": "auto_complete_visible", "operator": "equal", "operand": false },
