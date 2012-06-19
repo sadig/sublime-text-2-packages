@@ -1,5 +1,9 @@
 {
+<<<<<<< HEAD
 	"auto_upgrade_last_run": 1340031763,
+=======
+	"auto_upgrade_last_run": 1339997236,
+>>>>>>> d9b410841ef2a8d5704c407c475bc279641badbd
 	"installed_packages":
 	[
 		"Package Control"
