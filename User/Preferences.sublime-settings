@@ -19,6 +19,7 @@
 	"match_brackets_braces": true,
 	"match_brackets_content": true,
 	"match_brackets_square": true,
+	"minimap_scroll_to_clicked_text": false,
 	"overlay_scroll_bars": "enabled",
 	"rulers":
 	[
