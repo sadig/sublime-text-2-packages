@@ -1,7 +1,7 @@
 {
 	"auto_indent": true,
 	"caret_style": "smooth",
-	"color_scheme": "Packages/TextMate-Themes/idleFingers.tmTheme",
+	"color_scheme": "Packages/idleFingers.tmTheme",
 	"default_line_ending": "unix",
 	"detect_indentation": true,
 	"detect_slow_plugins": false,
