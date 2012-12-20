@@ -1,7 +1,10 @@
 {
-	"auto_upgrade_last_run": 1353783653,
 	"installed_packages":
 	[
-		"Package Control"
+		"Google Translate",
+		"Package Control",
+		"Python PEP8 Autoformat",
+		"Python Pep8 Lint",
+		"Theme - Soda"
 	]
 }
