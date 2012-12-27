@@ -16,5 +16,6 @@
     },
 
     { "keys": ["ctrl+v"], "command": "paste_and_indent" },
-    { "keys": ["ctrl+shift+v"], "command": "paste" }
+    { "keys": ["ctrl+shift+v"], "command": "paste" },
+    { "keys": ["ctrl+shift+c"], "command": "show_panel", "args": {"panel": "console", "toggle": true} }
 ]
