@@ -39,7 +39,7 @@ def find_trailing_spaces(view):
     line = view.line(sel.b)
     include_empty_lines = bool(ts_settings.get('trailing_spaces_include_empty_lines',
                                                DEFAULT_IS_ENABLED))
-    include_current_line = bool(ts_settings.get('trailing_spaces_inlude_current_line',
+    include_current_line = bool(ts_settings.get('trailing_spaces_include_current_line',
                                                 DEFAULT_IS_ENABLED))
     offending_lines = view.find_all('[ \t]+$' if include_empty_lines else '(?<=\S)[\t ]+$')
     if include_current_line:
@@ -58,8 +58,7 @@ def highlight_trailing_spaces(view):
     if view.size() <= max_size and not is_find_results(view):
         regions = find_trailing_spaces(view)
         view.add_regions('TrailingSpacesHighlightListener',
-                         regions, color_scope_name,
-                         sublime.DRAW_EMPTY)
+                         regions, color_scope_name)
 
 
 # Clear all trailing spaces

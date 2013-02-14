@@ -41,11 +41,11 @@ You'll find settings in Preferences menu (Preferences -> Package Settings -> Pyt
         // select errors / warnings(e.g. ["E4", "W"])
         "select": [],
 
-        // do not fix these errors / warnings(e.g. ["E4", "W"])
-        "ignore": ["E501"],
+        // do not fix these errors / warnings(e.g. ["E501", E4", "W"])
+        "ignore": [],
 
         // Maximum line length
-        "max-line-length": 79,
+        "max-line-length": 128,
 
         // enable possibly unsafe changes (E711, E712)
         "aggressive": false
@@ -55,8 +55,7 @@ By editing User settings, your personal liking will be kept safe over plug-in up
 
 ## Usage
 
-Formatting is applied on the whole document if there is no selection and operate only if the document
-is in Python syntax mode (default for all .py files).
+Formatting is applied on the whole document.
 
 ### Using keyboard:
 
@@ -83,7 +82,7 @@ Useful companions to Python PEP8 Autoformat:
 
 ## License
 
-Copyright 2012 Stéphane Bunel
+Copyright 2012-2013 Stéphane Bunel
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

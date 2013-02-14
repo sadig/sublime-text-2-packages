@@ -1,6 +1,20 @@
 # CHANGELOG
 Python PEP8 Autoformat
 
+## 2013.02.07-01
+  - Quick and Dirty FIX to [multiline-selection-on-saving-formatting][issue9]: reformating on block selection is now disabled.
+  Let me know if this feature was useful by opening a request to reintroduce it.
+
+## 2013.01.26-02
+  - Using the module API exposed by autopep8.
+
+## 2013.01.26-01
+  - FIX [Issue #7 View jumping in Sublime][issue7]. Thanks to Timon Wong
+  - Update autopep8 to version 0.8.5.
+
+## 2012.12.31-01
+  - Add Side bar menu
+
 ## 2012.12.20-01
   - FIX [Issue #8 Autoformat on save][issue8]. Thanks to zhenyu li
   - Update autopep8 to version 0.8.4.
@@ -99,4 +113,6 @@ Now uses a fixed autopep8 from [hhatto/fix-github-issue40][fix-github-issue40] b
 [fix-github-issue40]: https://github.com/hhatto/autopep8/issues/40
 [issue3]: https://bitbucket.org/StephaneBunel/pythonpep8autoformat/issue/3/downloaded-and-getting-error-on-ctrl-shift
 [issue4]: https://bitbucket.org/StephaneBunel/pythonpep8autoformat/issue/4/format-only-one-round
+[issue7]: https://bitbucket.org/StephaneBunel/pythonpep8autoformat/issue/7/view-jumping-in-sublime
 [issue8]: https://bitbucket.org/StephaneBunel/pythonpep8autoformat/issue/8/change-on_post_save-to-on_pre_save
+[issue9]: https://bitbucket.org/StephaneBunel/pythonpep8autoformat/issue/9/multiline-selection-on-saving-formatting
