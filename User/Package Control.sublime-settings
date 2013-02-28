@@ -7,6 +7,7 @@
 		"Python PEP8 Autoformat",
 		"Python Pep8 Lint",
 		"Theme - Soda",
-		"TrailingSpaces"
+		"TrailingSpaces",
+		"VCS Gutter"
 	]
 }
