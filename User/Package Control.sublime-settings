@@ -2,10 +2,14 @@
 	"auto_upgrade_last_run": null,
 	"installed_packages":
 	[
+		"All Autocomplete",
 		"Google Translate",
 		"Package Control",
+		"Python Auto-Complete",
 		"Python PEP8 Autoformat",
 		"Python Pep8 Lint",
+		"sublime-jslint",
+		"sublimelint",
 		"Theme - Soda",
 		"TrailingSpaces",
 		"VCS Gutter"
